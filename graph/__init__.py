@@ -2,7 +2,7 @@ from collections import defaultdict, deque, Iterable
 from heapq import heappop, heappush
 from itertools import combinations, count
 from bisect import insort
-from math import isclose
+from copy import deepcopy
 
 from graph.visuals import plot_3d
 
@@ -1178,60 +1178,171 @@ def has_path(graph, path):
     return True
 
 
+# def all_paths(graph, start, end):
+#     """
+#     :param graph: instance of Graph
+#     :param start: node
+#     :param end: node
+#     :return: list of paths unique from start to end.
+#     """
+#     cache = {}
+#
+#     if start == end:
+#         raise ValueError("start is end")
+#     if not graph.is_connected(start, end):
+#         return []
+#     paths = [(start,)]
+#     q = [start]
+#     skip_list = set()
+#     while q:
+#         n1 = q.pop(0)
+#         if n1 == end:
+#             continue
+#
+#         n2s = graph.nodes(from_node=n1)
+#         new_paths = [p for p in paths if p[-1] == n1]
+#         for n2 in n2s:
+#             if n2 in skip_list:
+#                 continue
+#             n3s = graph.nodes(from_node=n2)
+#
+#             con = cache.get((n2, n1))
+#             if con is None:
+#                 con = graph.is_connected(n2, n1)
+#                 cache[(n2, n1)] = con
+#
+#             if len(n3s) > 1 and con:
+#                 # it's a fork and it's a part of a loop!
+#                 # is the sequence n2,n3 already in the path?
+#                 for n3 in n3s:
+#                     for path in new_paths:
+#                         a = [n2, n3]
+#                         if any(all(path[i+j] == a[j] for j in range(len(a))) for i in range(len(path))):
+#                             skip_list.add(n3)
+#
+#             for path in new_paths:
+#                 if path in paths:
+#                     paths.remove(path)
+#
+#                 new_path = path + (n2,)
+#                 if new_path not in paths:
+#                     paths.append(new_path)
+#
+#             if n2 not in q:
+#                 q.append(n2)
+#
+#     paths = [list(p) for p in paths if p[-1] == end]
+#     return paths
+
+
+class Path:
+    """ A path has a list of moves and a graph to track it's edge values. An expired edge has a penalty value applied.
+        A path also has a dictionary of the predecessor which locked each edge. """
+    used_edge_value = 10
+    uuid_counter = count(1)
+
+    def __init__(self, path):
+        assert isinstance(path, list)
+        assert len(path) == 1
+        self.path = path
+        self.graph = Graph()
+        self.graph.add_node(path[0])
+        self.last_predecessor_of_node = {}  # dict of node : last used predecessor (need a new predecessor to unlock)
+        self.uuid = next(self.uuid_counter)
+
+    def __str__(self):
+        return "<{}> uuid: {}".format(self.__class__.__name__, self.uuid)
+
+    def __repr__(self):
+        return "<{}> uuid: {}".format(self.__class__.__name__, self.uuid)
+
+
 def all_paths(graph, start, end):
     """
-    :param graph: instance of Graph
-    :param start: node
-    :param end: node
-    :return: list of paths unique from start to end.
     """
-    cache = {}
-
     if start == end:
         raise ValueError("start is end")
     if not graph.is_connected(start, end):
         return []
-    paths = [(start,)]
+    live_paths = [Path([start, ])]
+    completed_paths = []
     q = [start]
-    skip_list = set()
     while q:
-        n1 = q.pop(0)
-        if n1 == end:
+        node_1 = q.pop(0)
+        if node_1 == end:
             continue
 
-        n2s = graph.nodes(from_node=n1)
-        new_paths = [p for p in paths if p[-1] == n1]
-        for n2 in n2s:
-            if n2 in skip_list:
-                continue
-            n3s = graph.nodes(from_node=n2)
+        node_2s = [each_node for each_node in graph.nodes(from_node=node_1)]
+        new_paths = [[p] for p in live_paths if p.path[-1] == node_1]
+        for path_object_list in new_paths:
+            for i in range(len(node_2s) - 1):
+                path_object_list.append(deepcopy(path_object_list[0]))
+                path_object_list[-1].uuid = next(Path.uuid_counter)
+        for each_node in node_2s:
+            node_2 = each_node
+            for path_object_list in new_paths:
+                path_obj = path_object_list.pop()
+                if path_obj.uuid == 7:
+                    print("Stop")
+                if node_2 in path_obj.graph.nodes():
+                    # we are re-visiting a node
+                    check_value = False
+                    # confirm that they are connected
+                    for edge in path_obj.graph.edges(from_node=node_1):
+                        if edge[1] == node_2:
+                            check_value = True
+                            break
+                    if check_value:
+                        if path_obj.graph.edges([node_1, node_2])[0][2] == path_obj.used_edge_value:
+                            if path_obj in live_paths:
+                                live_paths.remove(path_obj)  # remove this from further consideration
+                            continue
+                    # if node_1 is not last predecessor of node_2 reset the node values from node_2 for all nodes which
+                    # are not node_1
+                    if path_obj.last_predecessor_of_node[node_2] != node_1:
+                        curr_node_list = [node_2]
+                        visited_nodes = []
+                        while curr_node_list:
+                            curr_node = curr_node_list.pop(0)
+                            for edge in path_obj.graph.edges(from_node=curr_node):
+                                if edge[1] not in visited_nodes and not all((edge[0] == node_2, edge[1] == node_1)):
+                                    path_obj.graph.add_edge(node1=curr_node, node2=edge[1], value=1)
+                                    curr_node_list.append(edge[1])
+                            visited_nodes.append(curr_node)
+                path_obj.path.append(node_2, )
+                add_path = False
+                if path_obj.path[-1] != end:
+                    if path_obj not in live_paths:
+                        add_path = True
+                        for each_path_obj in live_paths:
+                            if each_path_obj.path == path_obj.path:
+                                add_path = False
+                                break
+                else:
+                    add_path = True
+                    for each_path_obj in completed_paths:
+                        if each_path_obj.path == path_obj.path:
+                            add_path = False
+                            break
+                    if path_obj in live_paths:
+                        live_paths.remove(path_obj)  # path is going to be added to completed paths instead
 
-            con = cache.get((n2, n1))
-            if con is None:
-                con = graph.is_connected(n2, n1)
-                cache[(n2, n1)] = con
+                # update node locks and update graph
+                if len(path_obj.path) > 2:
+                    path_obj.last_predecessor_of_node[node_1] = path_obj.path[-3]
+                else:
+                    path_obj.last_predecessor_of_node[node_1] = None
+                path_obj.graph.add_edge(node1=node_1, node2=node_2, value=path_obj.used_edge_value)
 
-            if len(n3s) > 1 and con:
-                # it's a fork and it's a part of a loop!
-                # is the sequence n2,n3 already in the path?
-                for n3 in n3s:
-                    for path in new_paths:
-                        a = [n2, n3]
-                        if any(all(path[i+j] == a[j] for j in range(len(a))) for i in range(len(path))):
-                            skip_list.add(n3)
+                if add_path:
+                    if path_obj.path[-1] == end:
+                        completed_paths.append(path_obj)
+                    else:
+                        live_paths.append(path_obj)  # path is original and valid
+                if node_2 not in q:
+                    q.append(node_2)
 
-            for path in new_paths:
-                if path in paths:
-                    paths.remove(path)
-
-                new_path = path + (n2,)
-                if new_path not in paths:
-                    paths.append(new_path)
-
-            if n2 not in q:
-                q.append(n2)
-
-    paths = [list(p) for p in paths if p[-1] == end]
+    paths = [list(p.path) for p in completed_paths]
     return paths
 
 

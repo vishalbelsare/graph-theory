@@ -295,6 +295,262 @@ def test_all_paths06():
     assert True, "All permutations of start and end passed."
 
 
+def test_all_paths06_bi():
+    """
+    [1] --> [2] --> [3] --> [4] --> [5]
+             ^               |
+             |               v
+    [10] --> +<---- [6] <----+
+     ^               |
+     |               v
+    [9] <-- [8] <-- [7]
+    """
+    g = Graph()
+    links = (1, 2), (2, 3), (3, 4), (4, 5), (4, 6), (6, 2), (6, 7), (7, 8), (8, 9), (9, 10), (10, 2)
+    start = 1
+    end = 5
+    for s, e in links:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=1, end=5)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
+def test_all_paths07():
+    g = Graph()
+    edges = (1, 2), (2, 3), (2, 4), (3, 4), (3, 5), (4, 5)
+    start = 5
+    end = 1
+    for s, e in edges:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=start, end=end)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
+def test_all_paths08():
+    """
+    [1] <--> [2] <--> [3] <--> [4] <--> [5]
+    """
+    g = Graph()
+    links = (1, 2), (2, 3), (3, 4), (4, 5)
+    start = 4
+    end = 5
+    for s, e in links:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=start, end=end)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
+def test_all_paths09():
+    """
+    [1] <--> [2] <--> [3] <--> [4] <--> [5]
+                     ^
+                     |
+                     v
+                    [9]
+    """
+    g = Graph()
+    links = (1, 2), (2, 3), (3, 4), (4, 5), (3, 9)
+    start = 1
+    end = 5
+    for s, e in links:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=start, end=end)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
+def test_all_paths10():
+    """
+    [1] --> [2] --> [3] --> [4] --> [5]
+             ^               |
+             |               v
+             | ---- [6] <----+
+             |        |
+             |        v
+            [8] <-- [7]
+    """
+    g = Graph()
+    links = (1, 2), (2, 3), (3, 4), (4, 5), (4, 6), (6, 2), (6, 7), (7, 8), (8, 2)
+    start = 1
+    end = 5
+    for s, e in links:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=start, end=end)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
+def test_all_paths11():
+    """
+    [1] --> [2] --> [3] --> [4] --> [5]
+             ^               |
+             |               v
+             | ---- [6] <----+
+    """
+    g = Graph()
+    links = (1, 2), (2, 3), (3, 4), (4, 5), (4, 6), (6, 2)
+    start = 1
+    end = 5
+    for s, e in links:
+        g.add_edge(s, e, 1, bidirectional=True)
+    paths = g.all_paths(start=start, end=end)
+
+    # assertions
+    for each in paths:
+        assert each[0] == start
+        assert each[-1] == end
+    assert len(set(tuple(i) for i in paths)) == len(paths)
+    print(f"{len(paths)} unique paths have been found")
+    print(paths)
+
+    # check for repeated patterns
+    all_nodes = set([item for sublist in paths for item in sublist])
+    for each_path in paths:
+        first_dict = {}
+        second_dict = {}
+        for each_node in all_nodes:
+            first_dict[each_node] = []
+            second_dict[each_node] = []
+        for index in range(len(each_path)):
+            if second_dict[each_path[index]]:
+                # compare first dict with second dict
+                assert first_dict[each_path[index]] != second_dict[each_path[index]], f"{each_path} has repeated segment"
+            second_dict[each_path[index]] = first_dict[each_path[index]].copy()
+            first_dict[each_path[index]] = []
+
+            for k, v in first_dict.items():
+                if k != each_path[index]:
+                    first_dict[k].append(each_path[index])
+
+
 def test_dfs():
     links = [
         (1, 2, 0),
