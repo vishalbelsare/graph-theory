@@ -1,10 +1,10 @@
-from graph import Graph
+from .base import BasicGraph
 from itertools import count
 
 
 class FiniteStateMachine(object):
     def __init__(self):
-        self.states = Graph()
+        self.states = BasicGraph()
         self.current_state = None
         self._action_id = count()
         self.actions = {}
@@ -17,7 +17,7 @@ class FiniteStateMachine(object):
         :return: None
         """
         if self._initial_state_was_set:
-            raise ValueError(f"initial state has already been set.")
+            raise ValueError("initial state has already been set.")
         if state not in self.states.nodes():
             raise ValueError(f"{state} is not a state.")
         self.current_state = state

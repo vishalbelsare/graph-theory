@@ -1,5 +1,5 @@
 from time import process_time
-from graph import Graph
+from .base import BasicGraph
 from bisect import insort
 from itertools import product
 
@@ -135,8 +135,8 @@ def check_user_input(graph, loads):
 
     returns: list of Loads
     """
-    if not isinstance(graph, Graph):
-        raise TypeError(f"expected graph, not {type(graph)}")
+    if not isinstance(graph, BasicGraph):
+        raise TypeError(f"Expected subclass of BasicGraph, not {type(graph)}")
 
     all_loads = {}
     all_nodes = set()
@@ -304,8 +304,9 @@ class State(object):
 
 class JamSolver(object):
     def __init__(self, graph, loads, timer):
-        if not isinstance(graph, Graph):
-            raise TypeError
+        if not isinstance(graph, BasicGraph):
+            raise TypeError(f"Expected subclass of BasicGraph, not {type(graph)}")
+        Graph = type(graph)
         if not isinstance(loads, dict):
             raise TypeError
         if not all(isinstance(i, Load) for i in loads.values()):
@@ -353,6 +354,10 @@ class JamSolver(object):
 
         self.done = False
         self.return_on_first = False
+
+    def __str__(self):
+        s = "timed out" if self.timer.expired() else "running"
+        return f"<{self.__class__.__name__}> {s}"
 
     def _distance(self, load_id, location):
         try:
@@ -442,10 +447,11 @@ class JamSolver(object):
         of the valid end states """
         d_min, p_min = float('inf'), None
         for end in self.final_states:
-            d, p = self.movements.shortest_path(self.start, end)
-            if d < d_min:  # then this solution is better than the previous.
-                d_min = d
-                p_min = p
+            if end in self.movements:
+                d, p = self.movements.shortest_path(self.start, end)
+                if d < d_min:  # then this solution is better than the previous.
+                    d_min = d
+                    p_min = p
         return d_min, p_min
 
     def _match(self):

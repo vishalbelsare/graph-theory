@@ -227,7 +227,8 @@ def find_perfect_circuit(graph, start, jobs):
     :param: jobs: list of movements [(A1,B1), (A2,B2,) ....]
     :return path [A1,B1, ..., A1]
     """
-    g = Graph()
+    G = type(graph)
+    g = G()
     for A, B in jobs:
         try:
             g.edge(A, B)

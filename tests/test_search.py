@@ -2,7 +2,8 @@ import random
 import time
 from itertools import combinations, permutations
 
-from graph import Graph, same_path
+from graph import Graph
+from graph.base import same_path
 from tests.test_graph import graph01, graph3x3, graph03, graph04, graph05, graph4x4
 from examples.graphs import london_underground
 
@@ -595,6 +596,32 @@ def test_cached_graph():
     d1, p1 = g.shortest_path(a, b)
     assert d1 == d2, (d1, d2)
     assert p1 == p2, (p1, p2)
+
+
+def test_cached_graph_no_path():
+    """
+    Returns for a cached graph should be the same as for an uncached graph.
+    [1] --> [2]    [3] --> [4]
+    """
+    g = Graph(from_list=[(1, 2, 1), (3, 4, 1)])
+
+    # for no path
+    d1, p1 = g.shortest_path(1, 4)
+    assert d1 == float("inf")
+    assert p1 == []
+
+    d2, p2 = g.shortest_path(1, 4, memoize=True)
+    assert d1 == d2
+    assert p1 == p2
+
+    # for same start and end
+    d1, p1 = g.shortest_path(1, 1)
+    assert d1 == 0
+    assert p1 == [1]
+
+    d2, p2 = g.shortest_path(1, 1, memoize=True)
+    assert d1 == d2
+    assert p1 == p2
 
 
 def test_cached_graph2():

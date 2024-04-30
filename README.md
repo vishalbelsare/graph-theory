@@ -1,8 +1,9 @@
 # graph-theory
-[![Build Status](https://app.travis-ci.com/root-11/graph-theory.svg?branch=master)](https://app.travis-ci.com/root-11/graph-theory)
-[![Code coverage](https://codecov.io/gh/root-11/graph-theory/branch/master/graph/badge.svg)](https://codecov.io/gh/root-11/graph-theory)
+![Build status](https://github.com/root-11/graph-theory/actions/workflows/python-test.yml/badge.svg)
+[![codecov](https://codecov.io/gh/root-11/graph-theory/branch/master/graph/badge.svg?token=hWbKhIXskp)](https://codecov.io/gh/root-11/graph-theory)
 [![Downloads](https://pepy.tech/badge/graph-theory)](https://pepy.tech/project/graph-theory)
 [![Downloads](https://pepy.tech/badge/graph-theory/month)](https://pepy.tech/project/graph-theory/month)
+[![PyPI version](https://badge.fury.io/py/graph-theory.svg)](https://badge.fury.io/py/graph-theory)
 
 
 A simple graph library...<br>
@@ -11,16 +12,6 @@ A simple graph library...<br>
 *... with code that you can explain to your boss...*<br>
 
 Detailed tutorial evolving in the [examples section](https://github.com/root-11/graph-theory/blob/master/examples/readme.md).
----------------------------
-
-Latest feature:
-
-    2022/01/04 new feature: Graph.distance_map, which allows the user to compute
-               the distance from a number of starts and ends as simulated annealing map.
-    2022/01/04 new generation of the traffic jam solver.
-    2021/12/12 shortest path now accepts keyword `avoids`, which allows the user
-               to declare nodes which cannot be a part of the path.
-               This feature has no impact on performance.
 
 ---------------------------
 Install:
@@ -30,6 +21,10 @@ Install:
 Upgrade:
 
     pip install graph-theory --upgrade --no-cache
+
+Testing:
+
+    pytest tests
 
 ---------------------------
 Import:
@@ -144,4 +139,5 @@ All module functions are available from Graph and Graph3D (where applicable).
 - Joshua Crestone for all simple paths test.
 - CodeMartyLikeYou for detecting a bug in `@memoize` 
 - Tom Carroll for detecting the bug in del_edge and inspiration for topological sort.
+- Sappique for discovering bugs in `__eq__`, `copy` and `has_cycles`.
 

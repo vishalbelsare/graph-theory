@@ -230,6 +230,43 @@ def test_in_and_out_degree():
         assert g.in_degree(node) == in_degree[node]
         assert g.out_degree(node) == out_degree[node]
 
+def test_equals():
+    g1 = Graph(from_list=[(1,2),(2,3)])
+    g2 = g1.copy()
+    assert g1 == g2
+
+    g1.add_edge(3,1)
+    g1.del_edge(3,1)
+    assert g1 == g2
+
+    assert g1.edges() == g2.edges()
+    assert g1.nodes() == g2.nodes()
+
+def test_equals_2():
+    g1 = Graph(from_list=[(1,2),(2,3)])
+    g2 = Graph(from_list=[(1,2),(2,3)])
+    _ = g1.edge(3,1)  # simple getter.
+    assert g1._edges == g2._edges
+    assert g1 == g2
+
+
+def test_copy_equals():
+    g1 = Graph(from_list=[(1,2),(2,3)])
+    g1.add_edge(3,1)
+    g1.del_edge(3,1)
+    g2 = g1.copy()
+    assert g1 == g2
+
+
+def test_copy_equals_2():
+    g1 = Graph(from_list=[(1,2),(2,3)])
+    g1.edge(3,1)
+    g2 = g1.copy()
+    assert g1 == g2
+    assert g1._edges == g2._edges
+    assert g1._edges is not g2._edges, "the two graphs must be independent"
+    assert g1._edge_count == g2._edge_count
+    
 
 def test_copy():
     g = graph05()
@@ -326,20 +363,20 @@ def test_no_edge_connected():
     g = Graph()
     g.add_node(4)
     g.add_node(5)
-    assert g.is_connected(4, 5) == False
+    assert g.is_connected(4, 5) is False
 
 
 def test_edge_connected():
     g = Graph()
     g.add_edge(4, 5)
-    assert g.is_connected(4, 5) == True
+    assert g.is_connected(4, 5) is True
 
 
 def test_edge_not_connected():
     g = Graph()
     g.add_edge(3, 4)
     g.add_edge(5, 4)
-    assert g.is_connected(3, 5) == False
+    assert g.is_connected(3, 5) is False
 
 
 def test_del_edge():
@@ -359,3 +396,4 @@ def test_del_edge():
     assert len(g._reverse_edges) == 0
     assert len(g._in_degree) == 0
     assert len(g._out_degree) == 0
+
